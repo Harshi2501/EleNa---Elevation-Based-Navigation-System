@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Leaflet Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <style>
+    :root {
+    --primary-color: #1b4d3e;
+    --secondary-color: #ffcc33;
+    --text-color: #333;
+    }
+
+    /* Update body font */
+    body {
+    font-family: "Lato", sans-serif;
+    }
+
+    /* Update sidenav styles */
+    .sidenav {
+    height: 100%;
+    width: 20%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: var(--primary-color);
+    overflow-x: hidden;
+    padding-top: 20px;
+    }
+
+    .sidenav a {
+    padding: 10px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #fff;
+    display: block;
+    }
+
+    .sidenav a:hover {
+    background-color: var(--secondary-color);
+    color: #333;
+    }
+
+    /* Update main styles */
+    .main {
+    margin-left: 20%;
+    font-size: 16px;
+    padding: 10px 10px;
+    height: 95vh;
+    }
+
+    /* Update map styles */
+    .map {
+    height: 100%;
+    }
+
+    /* Update form styles */
+    form {
+    margin-left: 20px;
+    }
+
+    label {
+    color: #fff;
+    }
+
+    input[type="text"],
+    select,
+    input[type="number"] {
+    background-color: #fff;
+    color: var(--text-color);
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 200px;
+    border-radius: 5px;
+    }
+
+    button {
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+    background-color: #ffa500;
+    }
+
+    /* Update dropdown styles */
+    select option {
+    background-color: var(--primary-color);
+    color: #fff;
+    }
+
+    /* Update fancy heading styles */
+    .fancy-heading {
+    color: #fff;
+    font-family: "Lobster", cursive;
+    margin-left: 20px;
+    font-size: 40px;
+    }
+
+    /* Update results styles */
+    .results {
+    color: #000;
+    padding: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 2px solid var(--secondary-color);
+    background-color: #fff;
+    text-align: center;
+    }
+
+    .results h2 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .results p {
+        margin: 0;
+    }
+</style>
+</head>
+<body>
+    <div class="sidenav">
+        <h1 class="fancy-heading">EleNa</h1>
+        <form onsubmit="return false;">
+            <label for="source">Source:</label>
+            <br>
+            <input type="text" id="source">
+            <br>
+            <label for="destination">Destination:</label>
+            <br>
+            <input type="text" id="destination">
+            <br>
+            <label for="maxmin">Elevation Preference</label>
+            <br>
+            <select id="maxmin">
+                <option value="max">Maximize Elevation</option>
+                <option value="min">Minimize Elevation</option>
+            </select>
+            <br>
+            <label for="algorithm">Routing Algorithm</label>
+            <br>
+            <select id="algorithm">
+                <option value="djik">Djikstra's Algorithm</option>
+                <option value="astar">A-star Algorithm</option>
+            </select>
+            <br>
+            <label for="percentage">Elevation Max path limit (x%)</label>
+            <br>
+            <input type="number" id="percentage" name="percentage" min="0" max="100" step="1">
+            <br>
+            <button onclick="showOnMap()">Go</button>
+        </form>
+        <hr>
+
+        <div id="results" class="results">
+            <!-- Result content goes here -->
+            <h2 class="results">Results</h2>
+            <p>Total Distance:</p>
+            <br>
+            <p>0 meters</p>
+            <br>
+            <p>Elevation Gain:</p>
+            <br>
+            0 meters
+        </div>
+    </div>
+
+    <div class="main">
+        <div id="map" class="map"></div>
+    </div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+
+        var mymap = L.map('map').setView([42.37034, -72.505769], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(mymap);
+
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(mymap);
+        }
+
+        mymap.on('click', onMapClick);
+        var _geocoderType = L.Control.Geocoder.nominatim();
+        var geocoder = L.Control.geocoder({
+        geocoder: _geocoderType,
+        defaultMarkGeocode: false,
+        collapsed: true,
+        placeholder: "Search for a location",
+        }).on('markgeocode', function(e) {
+        mymap.setView(e.geocode.center, 13);
+        }).addTo(mymap);
+
+        function showOnMap() {
+        var locationInput = document.getElementById('source').value;
+        _geocoderType.geocode(locationInput, function(results) {
+            var latlng = results[0].center;
+            mymap.setView(latlng, 13);
+            var marker = L.marker(latlng).addTo(mymap);
+        });
+        }
+    </script>
+</body>
+</html>

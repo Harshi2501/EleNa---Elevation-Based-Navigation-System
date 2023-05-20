@@ -108,6 +108,45 @@ class routing_algorithms:
         
         return parent, end_node, temp_dist
 
+        if self.start_node is None or self.end_node is None:
+            return False
+        return True
+
+    def get_route(self, parent_node, dest):
+        path = [dest]
+        curr_node = parent_node[dest]
+        while curr_node!=-1:
+            path.append(curr_node)
+            curr_node = parent_node[curr_node]
+        return list(reversed(path))
 
 
+    def get_elev_cost(self, route, cost_type = cost_mode_3):
+        # For a particular route, the function returrns the total or piecewise cost.
+        total = 0
+        elevation_cost=0
+        for i in range(len(route)-1):
+            if cost_type == cost_mode_3:
+                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_3)	
+            elif cost_type == cost_mode_2:
+                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_2)
+            elif cost_type == cost_mode_1:
+                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_1)
+            elif cost_type == cost_mode_0:
+                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_0)
+            total += elevation_cost
+        return total
+
+
+
+    def dijkstra_path(self):
+        #Implements Dijkstra's Algorithm
+        
+        if not (self.start_node is None or self.end_node is None):
+            parent_node,end_node,curr_dist=self.bfs_traversal()
+            route = self.get_route(parent_node, end_node)
+            elevation_dist, dropDist = self.get_Elevation(route, cost_mode_2), self.get_Elevation(route, cost_mode_1)
+            self.best = [route[:], curr_dist, elevation_dist, dropDist]
+
+        return
 

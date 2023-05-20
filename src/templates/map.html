@@ -4,6 +4,7 @@
   <title>My Leaflet Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
   <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -126,6 +127,10 @@
     .results p {
         margin: 0;
     }
+
+    .leaflet-dashed-line {
+        stroke-dasharray: 4, 8; /* Customize the dashed line pattern */
+    }
 </style>
 </head>
 <body>
@@ -180,6 +185,7 @@
     </div>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script>
 
         var mymap = L.map('map').setView([42.37034, -72.505769], 13);
@@ -190,11 +196,44 @@
 
         var popup = L.popup();
 
+        var sourceMarker, destinationMarker;
+        var routingControl;
+
         function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(mymap);
+            if (!sourceMarker) {
+                sourceMarker = L.marker(e.latlng).addTo(mymap);
+            } else if (!destinationMarker) {
+                destinationMarker = L.marker(e.latlng).addTo(mymap);
+                calculateRoute();
+            } else {
+                sourceMarker.removeFrom(mymap);
+                destinationMarker.removeFrom(mymap);
+                sourceMarker = L.marker(e.latlng).addTo(mymap);
+                destinationMarker = null;
+                mymap.removeControl(routingControl);
+            }
+        }
+
+        function calculateRoute() {
+            var waypoints = [
+                sourceMarker.getLatLng(),
+                destinationMarker.getLatLng()
+            ];
+
+            var options = {
+                waypoints: waypoints,
+                profile: 'cycling',
+                preference: 'shortest',
+                routeWhileDragging: true
+            };
+
+            routingControl = L.Routing.control({
+                waypoints: waypoints,
+                lineOptions: {
+                    styles: [{ className: 'leaflet-dashed-line' }] // Apply the custom style to the route polyline
+                }
+            }).addTo(mymap);
+            routingControl.hide();
         }
 
         mymap.on('click', onMapClick);

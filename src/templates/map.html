@@ -154,7 +154,7 @@
             <br>
             <label for="percentage">Elevation Max path limit (x%)</label>
             <br>
-            <input type="number" id="percentage" name="percentage" min="0" max="100" step="1">
+            <input type="number" id="percentage" name="percentage" min="0" max="100" step="1" value="0">
             <br>
             <button onclick="showOnMap()">Go</button>
         </form>
@@ -227,12 +227,20 @@
             $.ajax({
                 type: 'POST',
                 url: '/calculate_route', // Replace with the Flask endpoint URL
-                data: JSON.stringify(waypoints),
+                data: JSON.stringify({
+                    waypoints: waypoints,
+                    option: $('#maxmin').val(),
+                    percentage: $('#percentage').val()
+                }),
                 contentType: 'application/json',
                 success: function(response) {
                     var coordinatesArray = response.coordinates;
+                    var option = response.option;
+                    var percentage = response.percentage;
                     // Process the coordinatesArray as needed
                     console.log(coordinatesArray);
+                    console.log(option);
+                    console.log(percentage);
                 }
             });
 

@@ -8,12 +8,14 @@ def home():
 
 @app.route('/calculate_route', methods=['POST'])
 def calculate_route():
-    waypoints = request.get_json()
+    data = request.get_json()
     
     # Perform any necessary processing or calculations with the waypoints
-    
+    print(data)
     # Send back the same waypoints in the response
-    response = {'coordinates': waypoints}
+    response = {'coordinates': data['waypoints'],
+                'option': data['option'],
+                'percentage':data['percentage']}
     
     return jsonify(response)
 

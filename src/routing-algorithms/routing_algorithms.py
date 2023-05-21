@@ -108,9 +108,24 @@ class routing_algorithms:
         
         return parent, end_node, temp_dist
 
-        if self.start_node is None or self.end_node is None:
-            return False
-        return True
+
+    def get_Elevation(self, route, cost_type = "cost_mode_3"):
+        # For a particular route, the function returrns the total or piecewise cost.
+        total = 0
+        diff=0
+        for i in range(len(route)-1):
+            if cost_type == cost_mode_3:
+                diff = self.compute_cost(route[i],route[i+1],cost_mode_3)	
+            elif cost_type == cost_mode_2:
+                diff = self.compute_cost(route[i],route[i+1],cost_mode_2)
+            elif cost_type == cost_mode_1:
+                diff = self.compute_cost(route[i],route[i+1],cost_mode_1)
+            elif cost_type == cost_mode_0:
+                diff = self.compute_cost(route[i],route[i+1],cost_mode_0)
+            total += diff
+        return total
+
+
 
     def get_route(self, parent_node, dest):
         path = [dest]
@@ -121,27 +136,9 @@ class routing_algorithms:
         return list(reversed(path))
 
 
-    def get_elev_cost(self, route, cost_type = cost_mode_3):
-        # For a particular route, the function returrns the total or piecewise cost.
-        total = 0
-        elevation_cost=0
-        for i in range(len(route)-1):
-            if cost_type == cost_mode_3:
-                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_3)	
-            elif cost_type == cost_mode_2:
-                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_2)
-            elif cost_type == cost_mode_1:
-                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_1)
-            elif cost_type == cost_mode_0:
-                elevation_cost = self.compute_cost(route[i],route[i+1],cost_mode_0)
-            total += elevation_cost
-        return total
-
-
-
     def dijkstra_path(self):
         #Implements Dijkstra's Algorithm
-        print("inside")
+        
         if not (self.start_node is None or self.end_node is None):
             parent_node,end_node,curr_dist=self.bfs_traversal()
             route = self.get_route(parent_node, end_node)
@@ -149,6 +146,7 @@ class routing_algorithms:
             self.best = [route[:], curr_dist, elevation_dist, dropDist]
 
         return
+
 
 
     def get_route_a_star(self, nodes, curr_node):
@@ -171,7 +169,7 @@ class routing_algorithms:
 
         return cost
     
-    def a_star(self):
+    def a_star_path(self):
         if self.start_node is None or self.end_node is None:
             return
         visited = set()
@@ -194,35 +192,35 @@ class routing_algorithms:
 
         updated_weights[start_node] = graph.nodes[start_node]['dist_from_dest']*0.1
 
-        while(len(unvisited) > 0):
+        while len(unvisited) :
             curr_node = min([(node,updated_weights[node]) for node in unvisited], key=lambda t: t[1])[0]            
             if curr_node == end_node:
                 path=self.get_route_a_star(lcn, curr_node)
                 print(path)
-                self.best = [path[:], self.get_elev_cost(path, cost_mode_0), self.get_elev_cost(path, cost_mode_2), self.get_Elevation(path, cost_mode_1)]
+                self.best = [path[:], self.get_Elevation(path, cost_mode_0), self.get_Elevation(path, cost_mode_2), self.get_Elevation(path, cost_mode_1)]
                 return
 
             unvisited.remove(curr_node)
             visited.add(curr_node)
             
+            # new_cost, new_cost_heuristics = 0.0,0.0
+            for neighbour in graph.neighbors(curr_node):
+                if neighbour in visited:
+                    continue
+                if elev_option == elev_type_1:
+                    new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_2)
+                elif elev_option == elev_type_0:
+                    new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_1)
 
-            for neighbour in graph.neighbours(curr_node):
-                if neighbour not in visited:
-                    if elev_option == elev_type_1:
-                        new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_2)
-                    elif elev_option == elev_type_1:
-                        new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_1)
-    
-                    new_cost_heuristics = new_cost_heuristics[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_0)
+                new_cost_heuristics = heuristics_graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_0)
 
-                    if neighbour not in unvisited and new_cost<=(1+elev_perc)*shortest_dist:
-                        unvisited.add(neighbour)
-                    else: 
-                        if (new_cost >= new_cost[neighbour]) or (new_cost>=(1+elev_perc)*shortest_dist):
-                            continue 
+                if neighbour not in unvisited and new_cost_heuristics<=(1+elev_perc)*shortest_dist:
+                    unvisited.add(neighbour)
+                else: 
+                    if (new_cost >= graph_weights[neighbour]) or (new_cost_heuristics>=(1+elev_perc)*shortest_dist):
+                        continue 
 
-            lcn[neighbour] = curr_node
-            new_cost[neighbour] = new_cost
-            new_cost_heuristics[neighbour] = new_cost_heuristics
-            updated_weights[neighbour] = new_cost[neighbour] + graph.nodes[neighbour]['dist_from_dest']*0.1
-
+                lcn[neighbour] = curr_node
+                graph_weights[neighbour] = new_cost
+                heuristics_graph_weights[neighbour] = new_cost_heuristics
+                updated_weights[neighbour] = graph_weights[neighbour] + graph.nodes[neighbour]['dist_from_dest']*0.1

@@ -186,6 +186,7 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
         var mymap = L.map('map').setView([42.37034, -72.505769], 13);
@@ -220,12 +221,27 @@
                 destinationMarker.getLatLng()
             ];
 
+            console.log(waypoints);
+
             var options = {
                 waypoints: waypoints,
                 profile: 'cycling',
                 preference: 'shortest',
                 routeWhileDragging: true
             };
+
+            // Send the waypoints to the Flask backend
+            $.ajax({
+                type: 'POST',
+                url: '/calculate_route', // Replace with the Flask endpoint URL
+                data: JSON.stringify(waypoints),
+                contentType: 'application/json',
+                success: function(response) {
+                    var coordinatesArray = response.coordinates;
+                    // Process the coordinatesArray as needed
+                    console.log(coordinatesArray);
+                }
+            });
 
             routingControl = L.Routing.control({
                 waypoints: waypoints,

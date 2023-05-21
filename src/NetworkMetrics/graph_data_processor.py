@@ -51,23 +51,55 @@ class graph_data_processing:
          return G
      
      #Calculates distance between a given edge node to all other nodes in the graph
-     def dist_calc(self, G, edge_node):
+     def dist_calc(self, G, e_node):
           #creating a copy of the original graph G using G.copy() to avoid modifying the original graph.
           G_copy = G.copy()  
 
           for node in G_copy.nodes():
             latitude2 = G_copy.nodes[node]['y']
             longitude2 = G_copy.nodes[node]['x']
-            distance = self.haversine_distance(edge_node["y"], edge_node["x"], latitude2, longitude2)
+            distance = self.haversine_distance(e_node["y"], e_node["x"], latitude2, longitude2)
             # Setting 'dist_from_dest' attribute for each node
             nx.set_node_attributes(G_copy, {node: {'dist_from_dest': distance}})  
 
           return G_copy
      
-     def add_dist(self,G,ept):
+     def add_dist(self,G,endpoint):
         # Adding dist between final destination and all nodes
-        edge_node=G.nodes[ox.nearest_nodes(G, X= ept[1], Y=ept[0], return_dist=False)]            
-        return self.dist_calc(G,edge_node)        
+        e_node=G.nodes[ox.nearest_nodes(G, X= endpoint[1], Y=endpoint[0], return_dist=False)]            
+        return self.dist_calc(G,e_node)    
+
+    #Generates a graph and elevation data based on a specified starting point and endpoint.
+     def generate_graph(self, endpoint):
+         start_latitude = 42.384803
+         start_longitude = -72.529262
+         if not self.init:
+             print("Loading graph")
+             start = (start_latitude, start_longitude)
+
+             '''Calls the graph_from_point function from the osmnx library to generate 
+             a graph based on the starting point, with a specified distance and network type.'''
+             self.G = ox.graph_from_point(center_point=start, distance=20000, network_type='walk')
+
+             #Calls the add_elevation_data function to add elevation data to the graph.
+             self.G = self.add_elevation_data(self.G)
+             with open("graph.p", "wb") as f:
+                p.dump(self.G, f)            
+            #Updates the self.init variable to True to indicate that the graph has been initialized.
+             self.init = True
+             print("Graph saved")
+         '''Calls the add_dist function to add distance 
+        information between the endpoint and all nodes in the graph'''
+         self.G = self.add_dist(self.G, endpoint)
+         return self.G
+     
+
+if __name__ == "__main__":
+    graph_abstraction = graph_data_processing()
+    endpt = [40.7128, -74.0060]    
+    G = graph_abstraction.generate_graph(endpt) 
+    print(G) 
+             
 
 
      

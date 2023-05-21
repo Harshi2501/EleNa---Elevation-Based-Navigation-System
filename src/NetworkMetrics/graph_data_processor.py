@@ -4,6 +4,7 @@ import os
 import pickle as p
 from config import API
 import math
+from shapely.geometry import Point
 
 class graph_data_processing:
      def __init__(self):
@@ -28,18 +29,12 @@ class graph_data_processing:
         lon1_rad = math.radians(longitude1)
         lat2_rad = math.radians(latitude2)
         lon2_rad = math.radians(longitude2)
-
-
-        # print(lon1_rad)
-        # print(lon2_rad)
         # Earth's radius in kilometers
         earth_radius = 6371
 
         diff_lat = lat2_rad - lat1_rad 
         diff_long = lon2_rad-lon1_rad
 
-        # print(diff_lat)
-        # print(diff_long)
         value = math.sin(diff_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(diff_long/2)**2
         temp_value = 2 * math.atan2(math.sqrt(value), math.sqrt(1-value))
         
@@ -51,31 +46,40 @@ class graph_data_processing:
 
     #Adds elevation data to the graph
      def add_elevation_data(self, G):
-         G = ox.add_node_elevations(G, elevation_key="elevation", api_key=self.GOOGLEAPIKEY)
+         G = ox.add_node_elevations_google(G, elevation_key="elevation", api_key=self.GOOGLEAPIKEY)
          #Returns the updated graph with the added elevation data
          return G
      
-def main():
-    # Test coordinates (New York City and Los Angeles)
-    lat1, lon1 = 40.7128, -74.0060
-    lat2, lon2 = 34.0522, -118.2437
+     #Calculates distance between a given edge node to all other nodes in the graph
+     def dist_calc(self, G, edge_node):
+          #creating a copy of the original graph G using G.copy() to avoid modifying the original graph.
+          G_copy = G.copy()  
 
-    obj = graph_data_processing()
-    # Compute distance using haversine_distance function
-    distance = obj.haversine_distance(lat1, lon1, lat2, lon2)
+          for node in G_copy.nodes():
+            latitude2 = G_copy.nodes[node]['y']
+            longitude2 = G_copy.nodes[node]['x']
+            distance = self.haversine_distance(edge_node["y"], edge_node["x"], latitude2, longitude2)
+            # Setting 'dist_from_dest' attribute for each node
+            nx.set_node_attributes(G_copy, {node: {'dist_from_dest': distance}})  
 
-    # Print the result
-    print(f"The distance between the coordinates is {distance} meters.")
-
-if __name__ == '__main__':
-    main()
+          return G_copy
      
+     def add_dist(self,G,ept):
+        # Adding dist between final destination and all nodes
+        edge_node=G.nodes[ox.nearest_nodes(G, X= ept[1], Y=ept[0], return_dist=False)]            
+        return self.dist_calc(G,edge_node)        
+
+
+     
+
+
+
      
     
     
     
 
-         
+    
     
     
          

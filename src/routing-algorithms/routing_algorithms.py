@@ -1,4 +1,5 @@
 import osmnx as ox
+from osmnx import *
 import networkx as nx
 from collections import deque, defaultdict
 from heapq import *
@@ -36,7 +37,7 @@ class Algorithms:
         self.graph = graph
 
 
-        
+    
     def compute_cost(self, start, end, cost_type = cost_mode_0):
         graph = self.graph   
         if start is None or end is None:
@@ -79,7 +80,7 @@ class Algorithms:
 
 
 
- 
+   
 
 
     def compare(self, graph, shortestPathStats):
@@ -97,7 +98,8 @@ class Algorithms:
         return shortestPathStats, self.best_path
 
 
- 
+   
+
 
 
     def get_shortest_path(self, spt, ept, elev_perc, elev_option = "maximize", log=True):
@@ -108,15 +110,12 @@ class Algorithms:
         self.elev_option = elev_option
         self.start_node, self.end_node = None, None
 
-
-        # Obtains shortest path
-        self.start_node, d1 = ox.get_nearest_node(graph, point=spt, return_dist = True)
-        self.end_node, d2   = ox.get_nearest_node(graph, point=ept, return_dist = True)
-
+        self.start_node, d1 = ox.nearest_nodes(graph, X=spt[1], Y=spt[0], return_dist=True)
+        self.end_node, d2 = ox.nearest_nodes(graph, X=ept[1], Y=ept[0], return_dist=True) 
         # returns distance based shortest path
         self.shortest_route = nx.shortest_path(graph, source=self.start_node, target=self.end_node, weight='length')
         
-        self.shortest_dist  = sum(ox.get_route_edge_attributes(graph, self.shortest_route, 'length'))
+        self.shortest_dist  = sum(ox.utils_graph.get_route_edge_attributes(graph, self.shortest_route, 'length'))
         
         shortest_route_latlong = [[graph.nodes[route_node]['x'],graph.nodes[route_node]['y']] for route_node in self.shortest_route] 
         
@@ -144,6 +143,7 @@ class Algorithms:
         djikstra.dijkstra_path()
         djik_path = djikstra.get_best_path()
         end_time = time.time()
+     
         if log:
             print()
             print("Statics - Dijkstra's route")
@@ -166,13 +166,14 @@ class Algorithms:
 
         a_str = A_star(graph, shortest_dist,self.start_node, self.end_node, elev_perc, elev_option)
 
+        # self.best = [route[:], curr_dist, elevation_dist, dropDist]
         
         init = True
         start_time = time.time()
         a_str.a_star_path()
         a_str_path = a_str.get_best_path()
         end_time = time.time()
- 
+     
         if log:
             print()
             print("Statics - A Star's route")
@@ -181,6 +182,7 @@ class Algorithms:
             print(a_str_path["current_distance"])
             print("--- Time taken = %s seconds ---" % (end_time - start_time))
    
+
 
         if self.elev_option == "maximize":
             if (djik_path["elevation_distance"] > a_str_path["elevation_distance"]) or (djik_path["elevation_distance"] == a_str_path["elevation_distance"] and djik_path["current_distance"] < a_str_path["current_distance"]):

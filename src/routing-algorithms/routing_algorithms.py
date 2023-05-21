@@ -54,7 +54,7 @@ class routing_algorithms:
         start_node = self.start_node
         elev_option = self.elev_option
         elev_perc = self.elev_perc
-        shortest_distance = self.shortest_distance
+        shortest_distance = self.shortest_dist
         end_node = self.end_node
         start_node=self.start_node
         
@@ -141,7 +141,7 @@ class routing_algorithms:
 
     def dijkstra_path(self):
         #Implements Dijkstra's Algorithm
-        
+        print("inside")
         if not (self.start_node is None or self.end_node is None):
             parent_node,end_node,curr_dist=self.bfs_traversal()
             route = self.get_route(parent_node, end_node)
@@ -149,4 +149,80 @@ class routing_algorithms:
             self.best = [route[:], curr_dist, elevation_dist, dropDist]
 
         return
+
+
+    def get_route_a_star(self, nodes, curr_node):
+        if not nodes or not curr_node:
+            return 
+        path = [curr_node]
+        while curr_node in nodes:
+            curr_node = nodes[curr_node]
+            path.append(curr_node)
+        
+        return path
+
+    def compute_initial_cost_a_star(self, graph):
+        cost = {}
+
+        for node in graph.nodes():
+            cost[node] = float("inf")
+        
+        cost[self.start_node] = 0
+
+        return cost
+    
+    def a_star(self):
+        if self.start_node is None or self.end_node is None:
+            return
+        visited = set()
+        unvisited = set()
+
+        updated_weights = {}
+        lcn = {}
+
+        graph = self.graph
+        shortest_dist = self.shortest_dist
+        elev_perc = self.elev_perc
+        elev_option = self.elev_option
+        start_node = self.start_node
+        end_node = self.end_node
+
+        unvisited.add(start_node)
+
+        graph_weights = self.compute_initial_cost_a_star(graph)
+        heuristics_graph_weights = self.compute_initial_cost_a_star(graph)
+
+        updated_weights[start_node] = graph.nodes[start_node]['dist_from_dest']*0.1
+
+        while(len(unvisited) > 0):
+            curr_node = min([(node,updated_weights[node]) for node in unvisited], key=lambda t: t[1])[0]            
+            if curr_node == end_node:
+                path=self.get_route_a_star(lcn, curr_node)
+                print(path)
+                self.best = [path[:], self.get_elev_cost(path, cost_mode_0), self.get_elev_cost(path, cost_mode_2), self.get_Elevation(path, cost_mode_1)]
+                return
+
+            unvisited.remove(curr_node)
+            visited.add(curr_node)
+            
+
+            for neighbour in graph.neighbours(curr_node):
+                if neighbour not in visited:
+                    if elev_option == elev_type_1:
+                        new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_2)
+                    elif elev_option == elev_type_1:
+                        new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_1)
+    
+                    new_cost_heuristics = new_cost_heuristics[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_0)
+
+                    if neighbour not in unvisited and new_cost<=(1+elev_perc)*shortest_dist:
+                        unvisited.add(neighbour)
+                    else: 
+                        if (new_cost >= new_cost[neighbour]) or (new_cost>=(1+elev_perc)*shortest_dist):
+                            continue 
+
+            lcn[neighbour] = curr_node
+            new_cost[neighbour] = new_cost
+            new_cost_heuristics[neighbour] = new_cost_heuristics
+            updated_weights[neighbour] = new_cost[neighbour] + graph.nodes[neighbour]['dist_from_dest']*0.1
 

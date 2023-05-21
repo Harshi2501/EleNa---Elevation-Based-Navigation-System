@@ -1,8 +1,10 @@
-import osmnx as osx
-import networkx as ntx
-from collections import defaultdict
+import osmnx as ox
+import networkx as nx
+from collections import deque, defaultdict
 from heapq import *
 import time
+from djikstra import Djikstra
+from a_star import A_star
 
 cost_mode_0 = "no_elevation"
 cost_mode_1  = "elevation_drop"
@@ -13,21 +15,28 @@ elev_type_0 = "maximize"
 elev_type_1 = "minimize"
 
 
+class Algorithms:
+    def __init__(self, graph, elev_perc = 0.0, elev_option = "maximize"):
 
-class routing_algorithms:
-
-    def __init__(self, graph, elev_perc = 0.0, elev_option = "maximize" ):
         self.graph = graph
         self.elev_option = elev_option
         self.elev_perc = elev_perc
-        self.best = []
-        self.end_node = None
-        self.start_node = None
+        self.best_path = {}
+        self.best_path["route"]= []
+        self.best_path["elevation_distance"]= float("-inf")
+        self.best_path["drop_dist"]= 0.0
+        self.best_path["current_distance"]= 0.0
 
-    def refresh_graph(self, graph):
-        self.graph=graph
+        self.start_node= None
+        self.end_node =None
 
 
+    def reload(self, graph):
+        # Reloading with modified graph
+        self.graph = graph
+
+
+        
     def compute_cost(self, start, end, cost_type = cost_mode_0):
         graph = self.graph   
         if start is None or end is None:
@@ -48,67 +57,6 @@ class routing_algorithms:
 
 
 
-
-    def bfs_traversal(self):
-        graph = self.graph
-        start_node = self.start_node
-        elev_option = self.elev_option
-        elev_perc = self.elev_perc
-        shortest_distance = self.shortest_dist
-        end_node = self.end_node
-        start_node=self.start_node
-        
-        bfs_heap = [(0.0, 0.0, start_node)]
-
-        visited = set()
-
-        known = {start_node: 0}
-        
-        #stores information about previous node
-        parent = defaultdict(int)
-        parent[start_node]=-1
-
-        while bfs_heap:
-            temp_known, temp_dist, temp_node = heappop(bfs_heap)
-
-            if temp_node in visited:
-                continue
-
-            visited.add(temp_node)
-
-            if temp_node==end_node:
-                break
-
-            for neighbour in graph.neighbours(temp_node):
-                
-                if neighbour in visited:
-                    continue
-
-                p = known.get(neighbour, None)
-                temp_distance = self.compute_cost(temp_node, neighbour, cost_mode_0)
-
-                if elev_option==elev_type_0:
-                    if elev_perc <= 0.5:
-                        next_node_cost = temp_known+(temp_distance * 0.1 + self.compute_cost(temp_node, neighbour, cost_mode_1))
-                    else:
-                        next_node_cost = (temp_distance*0.1 - self.compute_cost(temp_node, neighbour, cost_mode_3))
-                else:
-                        next_node_cost = temp_known+(temp_distance * 0.1 + self.compute_cost(temp_node, neighbour, cost_mode_2))
-                
-
-                new_dist = temp_dist + temp_distance
-
-                if new_dist <= shortest_distance*(1.0+elev_perc) and (p is None or next_node_cost < p):
-                    parent[neighbour] = temp_node
-                    known[neighbour] = next_node_cost
-                    heappush(bfs_heap, (next_node_cost, new_dist, neighbour))
-
-        if not temp_dist:
-            return
-        
-        return parent, end_node, temp_dist
-
-
     def get_Elevation(self, route, cost_type = "cost_mode_3"):
         # For a particular route, the function returrns the total or piecewise cost.
         total = 0
@@ -125,102 +73,136 @@ class routing_algorithms:
             total += diff
         return total
 
-
-
-    def get_route(self, parent_node, dest):
-        path = [dest]
-        curr_node = parent_node[dest]
-        while curr_node!=-1:
-            path.append(curr_node)
-            curr_node = parent_node[curr_node]
-        return list(reversed(path))
-
-
-    def dijkstra_path(self):
-        #Implements Dijkstra's Algorithm
-        
-        if not (self.start_node is None or self.end_node is None):
-            parent_node,end_node,curr_dist=self.bfs_traversal()
-            route = self.get_route(parent_node, end_node)
-            elevation_dist, dropDist = self.get_Elevation(route, cost_mode_2), self.get_Elevation(route, cost_mode_1)
-            self.best = [route[:], curr_dist, elevation_dist, dropDist]
-
-        return
-
-
-
-    def get_route_a_star(self, nodes, curr_node):
-        if not nodes or not curr_node:
-            return 
-        path = [curr_node]
-        while curr_node in nodes:
-            curr_node = nodes[curr_node]
-            path.append(curr_node)
-        
-        return path
-
-    def compute_initial_cost_a_star(self, graph):
-        cost = {}
-
-        for node in graph.nodes():
-            cost[node] = float("inf")
-        
-        cost[self.start_node] = 0
-
-        return cost
     
-    def a_star_path(self):
-        if self.start_node is None or self.end_node is None:
-            return
-        visited = set()
-        unvisited = set()
 
-        updated_weights = {}
-        lcn = {}
 
+
+
+
+ 
+
+
+    def compare(self, graph, shortestPathStats):
+
+        if (self.elev_option == elev_type_0 and self.best_path["elevation_distance"] == float('-inf')) or (self.elev_option ==elev_type_1 and self.best_path["drop_dist"] == float('-inf')):            
+
+            return shortestPathStats, self.best_path
+        
+        self.best_path["route"] = [[graph.nodes[route_node]['x'],graph.nodes[route_node]['y']] for route_node in self.best_path["route"]]
+
+        # If computed path does not match the requirements
+        if((self.elev_option == elev_type_0 and self.best_path["elevation_distance"] < shortestPathStats["elevation_distance"]) or (self.elev_option ==elev_type_1 and self.best_path["elevation_distance"] > shortestPathStats["elevation_distance"])):
+            self.best_path = shortestPathStats
+        
+        return shortestPathStats, self.best_path
+
+
+ 
+
+
+    def get_shortest_path(self, spt, ept, elev_perc, elev_option = "maximize", log=True):
+        
+        # Computes Shortest Path
         graph = self.graph
+        self.elev_perc = elev_perc/100.0
+        self.elev_option = elev_option
+        self.start_node, self.end_node = None, None
+
+
+        # Obtains shortest path
+        self.start_node, d1 = ox.get_nearest_node(graph, point=spt, return_dist = True)
+        self.end_node, d2   = ox.get_nearest_node(graph, point=ept, return_dist = True)
+
+        # returns distance based shortest path
+        self.shortest_route = nx.shortest_path(graph, source=self.start_node, target=self.end_node, weight='length')
+        
+        self.shortest_dist  = sum(ox.get_route_edge_attributes(graph, self.shortest_route, 'length'))
+        
+        shortest_route_latlong = [[graph.nodes[route_node]['x'],graph.nodes[route_node]['y']] for route_node in self.shortest_route] 
+        
+        shortestPathStats = [shortest_route_latlong, self.shortest_dist, \
+                            self.get_Elevation(self.shortest_route, cost_mode_2), self.get_Elevation(self.shortest_route, cost_mode_1)]
+
+
+        shortestPathStats_copy = {}
+
+        shortestPathStats_copy["route"] = shortestPathStats[0]
+        shortestPathStats_copy["current_distance"] =shortestPathStats[1]
+        shortestPathStats_copy["elevation_distance"]=shortestPathStats[2]
+        shortestPathStats_copy["drop_dist"]=shortestPathStats[3]
+        
+        shortestPathStats = shortestPathStats_copy
+        if(elev_perc == 0):
+            return shortestPathStats, shortestPathStats
+
         shortest_dist = self.shortest_dist
-        elev_perc = self.elev_perc
-        elev_option = self.elev_option
-        start_node = self.start_node
-        end_node = self.end_node
 
-        unvisited.add(start_node)
+        djikstra = Djikstra(graph, shortest_dist,self.start_node, self.end_node, elev_perc, elev_option)
+        
+        init = True
+        start_time = time.time()
+        djikstra.dijkstra_path()
+        djik_path = djikstra.get_best_path()
+        end_time = time.time()
+        if log:
+            print()
+            print("Statics - Dijkstra's route")
+            print(djik_path["elevation_distance"])
+            print(djik_path["drop_dist"])
+            print(djik_path["current_distance"])
+            print("--- Time taken = %s seconds ---" % (end_time - start_time))
 
-        graph_weights = self.compute_initial_cost_a_star(graph)
-        heuristics_graph_weights = self.compute_initial_cost_a_star(graph)
 
-        updated_weights[start_node] = graph.nodes[start_node]['dist_from_dest']*0.1
+        if elev_option == "maximize": 
+            self.best_path["route"]= []
+            self.best_path["elevation_distance"]= float("-inf")
+            self.best_path["drop_dist"]= 0.0
+            self.best_path["current_distance"]= float("-inf")
+        else:
+            self.best_path["route"]= []
+            self.best_path["elevation_distance"]= float("inf")
+            self.best_path["drop_dist"]= 0.0
+            self.best_path["current_distance"]= float("-inf")
 
-        while len(unvisited) :
-            curr_node = min([(node,updated_weights[node]) for node in unvisited], key=lambda t: t[1])[0]            
-            if curr_node == end_node:
-                path=self.get_route_a_star(lcn, curr_node)
-                print(path)
-                self.best = [path[:], self.get_Elevation(path, cost_mode_0), self.get_Elevation(path, cost_mode_2), self.get_Elevation(path, cost_mode_1)]
-                return
+        a_str = A_star(graph, shortest_dist,self.start_node, self.end_node, elev_perc, elev_option)
 
-            unvisited.remove(curr_node)
-            visited.add(curr_node)
-            
-            # new_cost, new_cost_heuristics = 0.0,0.0
-            for neighbour in graph.neighbors(curr_node):
-                if neighbour in visited:
-                    continue
-                if elev_option == elev_type_1:
-                    new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_2)
-                elif elev_option == elev_type_0:
-                    new_cost = graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_1)
+        
+        init = True
+        start_time = time.time()
+        a_str.a_star_path()
+        a_str_path = a_str.get_best_path()
+        end_time = time.time()
+ 
+        if log:
+            print()
+            print("Statics - A Star's route")
+            print(a_str_path["elevation_distance"])
+            print(a_str_path["drop_dist"])
+            print(a_str_path["current_distance"])
+            print("--- Time taken = %s seconds ---" % (end_time - start_time))
+   
 
-                new_cost_heuristics = heuristics_graph_weights[curr_node] + self.compute_cost(curr_node, neighbour, cost_mode_0)
+        if self.elev_option == "maximize":
+            if (djik_path["elevation_distance"] > a_str_path["elevation_distance"]) or (djik_path["elevation_distance"] == a_str_path["elevation_distance"] and djik_path["current_distance"] < a_str_path["current_distance"]):
+                self.best_path = djik_path
+                if log:
+                    print("The Dijkstra algorithm computes the best possible route")
+                    print()
+            else:
+                self.best_path = a_str_path
+                if log:
+                    print("The A star algorithm computes the best possible route")
+                    print()
+        else:
+            if (djik_path["elevation_distance"] < a_str_path["elevation_distance"]) or (djik_path["elevation_distance"] == a_str_path["elevation_distance"] and djik_path["current_distance"] < a_str_path["current_distance"]):
+                self.best_path = djik_path
+                if log:
+                    print("The Dijkstra algorithm computes the best possible route")
+                    print()
+            else:
+                self.best_path = a_str_path
+                if log:
+                    print("The A star algorithm computes the best possible route")
+                    print()
 
-                if neighbour not in unvisited and new_cost_heuristics<=(1+elev_perc)*shortest_dist:
-                    unvisited.add(neighbour)
-                else: 
-                    if (new_cost >= graph_weights[neighbour]) or (new_cost_heuristics>=(1+elev_perc)*shortest_dist):
-                        continue 
-
-                lcn[neighbour] = curr_node
-                graph_weights[neighbour] = new_cost
-                heuristics_graph_weights[neighbour] = new_cost_heuristics
-                updated_weights[neighbour] = graph_weights[neighbour] + graph.nodes[neighbour]['dist_from_dest']*0.1
+        return self.compare(graph, shortestPathStats)

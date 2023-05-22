@@ -79,7 +79,7 @@ class graph_data_processing:
 
              '''Calls the graph_from_point function from the osmnx library to generate 
              a graph based on the starting point, with a specified distance and network type.'''
-             self.G = ox.graph_from_point(center_point=start, dist=20000, network_type='walk')
+             self.G = ox.graph_from_point(center_point=start, dist=20000, network_type='drive')
 
              #Calls the add_elevation_data function to add elevation data to the graph.
              self.G = self.add_elevation_data(self.G)

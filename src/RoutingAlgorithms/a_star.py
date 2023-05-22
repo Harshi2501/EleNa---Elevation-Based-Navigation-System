@@ -13,7 +13,7 @@ elev_type_0 = "max"
 elev_type_1 = "min"
 
 class A_star:
-    def __init__(self, graph, shortest_dist,  start_node, end_node, elev_perc = 0.0, elev_option = "maximize"):
+    def __init__(self, graph, shortest_dist,  start_node, end_node, elev_perc = 0.0, elev_option = elev_type_0):
         self.graph = graph
         self.elev_option = elev_option
         self.elev_perc = elev_perc
@@ -35,7 +35,7 @@ class A_star:
             try:
                 return graph.edges[start, end ,0]["length"]
             except : 
-                return graph.edges[start, end]["weight"]
+                return 0
         elif cost_type == cost_mode_3:
             return graph.nodes[end]["elevation"] - graph.nodes[start]["elevation"]
         elif cost_type == cost_mode_2:
@@ -47,7 +47,7 @@ class A_star:
 
 
 
-    def get_Elevation(self, route, cost_type = "cost_mode_3"):
+    def get_Elevation(self, route, cost_type = cost_mode_3):
         # For a particular route, the function returrns the total or piecewise cost.
         total = 0
         diff=0
@@ -62,10 +62,6 @@ class A_star:
                 diff = self.compute_cost(route[i],route[i+1],cost_mode_0)
             total += diff
         return total
-
-
-    def get_best_path(self):
-        return self.best_path
     
 
     def get_route_a_star(self, nodes, curr_node):

@@ -13,7 +13,7 @@ elev_type_0 = "max"
 elev_type_1 = "min"
 
 class Djikstra:
-    def __init__(self, graph, shortest_dist,  start_node, end_node, elev_perc = 0.0, elev_option = "maximize"):
+    def __init__(self, graph, shortest_dist,  start_node, end_node, elev_perc = 0.0, elev_option = elev_type_0):
         self.graph = graph
         self.elev_option = elev_option
         self.elev_perc = elev_perc

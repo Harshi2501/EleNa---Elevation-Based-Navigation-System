@@ -153,17 +153,6 @@ class Algorithms:
             print("--- Time taken = %s seconds ---" % (end_time - start_time))
 
 
-        if elev_option == "maximize": 
-            self.best_path["route"]= []
-            self.best_path["elevation_distance"]= float("-inf")
-            self.best_path["drop_dist"]= 0.0
-            self.best_path["current_distance"]= float("-inf")
-        else:
-            self.best_path["route"]= []
-            self.best_path["elevation_distance"]= float("inf")
-            self.best_path["drop_dist"]= 0.0
-            self.best_path["current_distance"]= float("-inf")
-
         a_str = A_star(graph, shortest_dist,self.start_node, self.end_node, elev_perc, elev_option)
 
         # self.best = [route[:], curr_dist, elevation_dist, dropDist]
@@ -184,7 +173,7 @@ class Algorithms:
    
 
 
-        if self.elev_option == "maximize":
+        if self.elev_option == elev_type_0:
             if (djik_path["elevation_distance"] > a_str_path["elevation_distance"]) or (djik_path["elevation_distance"] == a_str_path["elevation_distance"] and djik_path["current_distance"] < a_str_path["current_distance"]):
                 self.best_path = djik_path
                 if log:

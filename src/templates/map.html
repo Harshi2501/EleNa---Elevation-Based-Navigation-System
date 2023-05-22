@@ -28,7 +28,7 @@
     left: 0;
     background-color: var(--primary-color);
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 0px;
     }
 
     .sidenav a {
@@ -46,6 +46,7 @@
 
     /* Update main styles */
     .main {
+        position: relative;
     margin-left: 20%;
     font-size: 16px;
     padding: 10px 10px;
@@ -78,20 +79,6 @@
     border-radius: 5px;
     }
 
-    button {
-    background-color: var(--secondary-color);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
-    }
-
-    button:hover {
-    background-color: #ffa500;
-    }
-
     /* Update dropdown styles */
     select option {
     background-color: var(--primary-color);
@@ -106,11 +93,16 @@
     font-size: 40px;
     }
 
+    .fancy-subheading {
+    color: #fff;
+    margin-left: 20px;
+    }
+
     /* Update results styles */
     .results {
     color: #000;
-    padding: 10px;
-    margin-top: 10px;
+    padding: 5px;
+    margin-top: 5px;
     margin-left: 10px;
     margin-right: 10px;
     border: 2px solid var(--secondary-color);
@@ -140,16 +132,9 @@
 </head>
 <body>
     <div class="sidenav">
-        <h1 class="fancy-heading">EleNa</h1>
+        <h2 class="fancy-heading">EleNa</h2>
+        <h2 class="fancy-subheading">Configurations</h2>
         <form onsubmit="return false;">
-            <label for="source">Source:</label>
-            <br>
-            <input type="text" id="source">
-            <br>
-            <label for="destination">Destination:</label>
-            <br>
-            <input type="text" id="destination">
-            <br>
             <label for="maxmin">Elevation Preference</label>
             <br>
             <select id="maxmin">
@@ -160,21 +145,35 @@
             <label for="percentage">Elevation Max path limit (x%)</label>
             <br>
             <input type="number" id="percentage" name="percentage" min="0" max="100" step="1" value="0">
-            <br>
-            <button onclick="showOnMap()">Go</button>
         </form>
         <hr>
-
+        <div class="results">
+            <!-- Result content goes here -->
+            <h2 class="results">Legend</h2>
+            <p>Shortest Route:</p>
+            <p style="color: red;">Red Line</p>
+            <br>
+            <p>EleNa Route:</p>
+            <p style="color: black;">Dashed Black Line</p>
+            
+        </div>
         <div id="results" class="results">
             <!-- Result content goes here -->
             <h2 class="results">Results</h2>
-            <p>Total Distance:</p>
+            <p>Source:</p>
+            <p id="source">0.0 0.0</p>
             <br>
-            <p>0 meters</p>
+            <p>Destination:</p>
+            <p id="dest">0.0 0.0</p>
             <br>
-            <p>Elevation Gain:</p>
+            <p>Total Distance (m):</p>
+            <p id="totaldist">0 meters</p>
             <br>
-            0 meters
+            <p>Elevation Gain (m):</p>
+            <p id="elevgain">0 meters</p>
+            <br>
+            <p>Elevation Drop (m):</p>
+            <p id="elevdrop">0 meters</p>
         </div>
     </div>
 
@@ -246,6 +245,12 @@
                     var routeFromBackend = response.route.map(([first, second]) => [second, first]);
                     // console.log(arr1)
 
+                    document.getElementById("source").innerHTML = [waypoints[0].lat.toFixed(5), waypoints[0].lng.toFixed(5)];
+                    document.getElementById("dest").innerHTML = [waypoints[1].lat.toFixed(5), waypoints[1].lng.toFixed(5)];
+                    document.getElementById("totaldist").innerHTML = response.curr_dist.toFixed(4);
+                    document.getElementById("elevgain").innerHTML = response.elevation_dist.toFixed(4);
+                    document.getElementById("elevdrop").innerHTML = response.drop_dist.toFixed(4);
+
                     routingControl = L.Routing.control({
                         waypoints: waypoints,
                         lineOptions: {
@@ -280,14 +285,6 @@
         mymap.setView(e.geocode.center, 13);
         }).addTo(mymap);
 
-        function showOnMap() {
-        var locationInput = document.getElementById('source').value;
-        _geocoderType.geocode(locationInput, function(results) {
-            var latlng = results[0].center;
-            mymap.setView(latlng, 13);
-            var marker = L.marker(latlng).addTo(mymap);
-        });
-        }
     </script>
 </body>
 </html>

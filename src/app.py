@@ -1,4 +1,7 @@
 from flask import Flask, render_template, jsonify, request
+from NetworkMetrics.graph_data_processor import graph_data_processing
+from RoutingAlgorithms.routing_algorithms import Algorithms
+
 
 app = Flask(__name__)
 
@@ -20,18 +23,18 @@ def calculate_route():
 
     # Instantiate Algorithms class to calculate shortest route    
 
-    source_x = data['source_x']
-    source_y = data['source_y']
+    source_x = data['waypoints'][0]['lat']
+    source_y = data['waypoints'][0]['lng']
     startpt = [source_x, source_y]
 
-    destination_x = data['destination_x']
-    destination_y = data['destination_y']
+    destination_x = data['waypoints'][1]['lat']
+    destination_y = data['waypoints'][1]['lng']
     endpt = [destination_x, destination_y]  
 
     graph = constructGraph(startpt, endpt)
  
-    elev_perc = data['elev_perc']
-    elev_option = data['elev_option']
+    elev_perc = data['percentage']
+    elev_option = data['option']
 
     algorithms_obj = Algorithms(graph, elev_perc, elev_option)
     shortestPathStats, best_path = algorithms_obj.get_shortest_path(startpt, endpt, elev_perc, elev_option)

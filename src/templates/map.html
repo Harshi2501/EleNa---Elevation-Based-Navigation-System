@@ -129,7 +129,12 @@
     }
 
     .leaflet-dashed-line {
-        stroke-dasharray: 4, 8; /* Customize the dashed line pattern */
+        stroke-dasharray: 4, 8;
+        stroke: black; /* Customize the dashed line pattern */
+    }
+
+    .leaflet-solid-line {
+        stroke: red;
     }
 </style>
 </head>
@@ -192,6 +197,7 @@
 
         var sourceMarker, destinationMarker;
         var routingControl;
+        var routeFromWaypoints;
 
         function onMapClick(e) {
             if (!sourceMarker) {
@@ -205,6 +211,7 @@
                 sourceMarker = L.marker(e.latlng).addTo(mymap);
                 destinationMarker = null;
                 mymap.removeControl(routingControl);
+                mymap.removeControl(routeFromWaypoints);
             }
         }
 
@@ -234,23 +241,32 @@
                 }),
                 contentType: 'application/json',
                 success: function(response) {
-                    var coordinatesArray = response.coordinates;
-                    var option = response.option;
-                    var percentage = response.percentage;
-                    // Process the coordinatesArray as needed
-                    console.log(coordinatesArray);
-                    console.log(option);
-                    console.log(percentage);
+                    console.log(response);
+                    // var routeFromBackend = response.route;
+                    var routeFromBackend = response.route.map(([first, second]) => [second, first]);
+                    // console.log(arr1)
+
+                    routingControl = L.Routing.control({
+                        waypoints: waypoints,
+                        lineOptions: {
+                            styles: [{ className: 'leaflet-dashed-line' }] // Apply the custom style to the route polyline
+                        }
+                    }).addTo(mymap);
+
+                    routeFromWaypoints = L.Routing.control({
+                        waypoints: routeFromBackend,
+                        lineOptions: {
+                            styles: [{ className: 'leaflet-solid-line' }] // Apply the custom style to the route polyline
+                        },
+                        createMarker: function() {
+                            return null;
+                        }
+                    }).addTo(mymap);
+
+                    routingControl.hide();
+                    routeFromWaypoints.hide();
                 }
             });
-
-            routingControl = L.Routing.control({
-                waypoints: waypoints,
-                lineOptions: {
-                    styles: [{ className: 'leaflet-dashed-line' }] // Apply the custom style to the route polyline
-                }
-            }).addTo(mymap);
-            routingControl.hide();
         }
 
         mymap.on('click', onMapClick);

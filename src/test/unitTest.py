@@ -1,6 +1,7 @@
 import osmnx as ox
 import networkx as nx
 from graphTest import GraphTest
+from algorithmsTest import AlgorithmsTest
 import sys
 sys.path.append("..")
 from RoutingAlgorithms.routing_algorithms import Algorithms
@@ -27,6 +28,8 @@ class UnitTest:
        self.source = (42.373222, -72.519852)
        self.destination = (42.375544, -72.524210)
 
+       # Have a route to test elevation in routing algorithms
+       self.route = [0, 3, 4, 2]
 
     def runAllTests(self):
         # Test graph generation
@@ -34,8 +37,8 @@ class UnitTest:
         graphTest.runAllTests()
 
         # Test functionalities of the routing algorithms
-        #algorithmsTest = AlgorithmsTest()
-        #algorithmsTest.runAllTests()
+        algorithmsTest = AlgorithmsTest(self.algorithms_obj, self.graph, self.route)
+        algorithmsTest.runAllTests()
 
         # Test functionalities of the front-end
         #frontEndTest = FrontEndTest()

@@ -2,7 +2,7 @@ import osmnx as ox
 import networkx as nx
 import os
 import pickle as p
-from config import API
+from NetworkMetrics.config import API
 import math
 from shapely.geometry import Point
 
@@ -46,7 +46,7 @@ class graph_data_processing:
 
     #Adds elevation data to the graph
      def add_elevation_data(self, G):
-         G = ox.add_node_elevations_google(G, elevation_key="elevation", api_key=self.GOOGLEAPIKEY)
+         G = ox.add_node_elevations_google(G, api_key=self.GOOGLEAPIKEY)
          #Returns the updated graph with the added elevation data
          return G
      
@@ -79,7 +79,7 @@ class graph_data_processing:
 
              '''Calls the graph_from_point function from the osmnx library to generate 
              a graph based on the starting point, with a specified distance and network type.'''
-             self.G = ox.graph_from_point(center_point=start, distance=20000, network_type='walk')
+             self.G = ox.graph_from_point(center_point=start, dist=20000, network_type='walk')
 
              #Calls the add_elevation_data function to add elevation data to the graph.
              self.G = self.add_elevation_data(self.G)

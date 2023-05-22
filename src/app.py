@@ -11,7 +11,7 @@ def home():
 
 def constructGraph(startpt, endpt):
     graph_abstraction = graph_data_processing()   
-    graph = graph_abstraction.generate_graph(startpt, endpt) 
+    graph = graph_abstraction.generate_graph(endpt) 
     return graph
 
 @app.route('/calculate_route', methods=['POST'])
@@ -23,17 +23,17 @@ def calculate_route():
 
     # Instantiate Algorithms class to calculate shortest route    
 
-    source_x = data['waypoints'][0]['lat']
-    source_y = data['waypoints'][0]['lng']
+    source_x = float(data['waypoints'][0]['lat'])
+    source_y = float(data['waypoints'][0]['lng'])
     startpt = [source_x, source_y]
 
-    destination_x = data['waypoints'][1]['lat']
-    destination_y = data['waypoints'][1]['lng']
+    destination_x = float(data['waypoints'][1]['lat'])
+    destination_y = float(data['waypoints'][1]['lng'])
     endpt = [destination_x, destination_y]  
 
     graph = constructGraph(startpt, endpt)
  
-    elev_perc = data['percentage']
+    elev_perc = float(data['percentage'])
     elev_option = data['option']
 
     algorithms_obj = Algorithms(graph, elev_perc, elev_option)

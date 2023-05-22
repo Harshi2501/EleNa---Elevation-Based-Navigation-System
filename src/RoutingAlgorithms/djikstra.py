@@ -9,8 +9,8 @@ cost_mode_1  = "elevation_drop"
 cost_mode_2 = "elevation_gain"
 cost_mode_3 = "elevation_difference"
 
-elev_type_0 = "maximize"
-elev_type_1 = "minimize"
+elev_type_0 = "max"
+elev_type_1 = "min"
 
 class Djikstra:
     def __init__(self, graph, shortest_dist,  start_node, end_node, elev_perc = 0.0, elev_option = "maximize"):

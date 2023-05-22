@@ -4,16 +4,16 @@ import networkx as nx
 from collections import deque, defaultdict
 from heapq import *
 import time
-from djikstra import Djikstra
-from a_star import A_star
+from RoutingAlgorithms.djikstra import Djikstra
+from RoutingAlgorithms.a_star import A_star
 
 cost_mode_0 = "no_elevation"
 cost_mode_1  = "elevation_drop"
 cost_mode_2 = "elevation_gain"
 cost_mode_3 = "elevation_difference"
 
-elev_type_0 = "maximize"
-elev_type_1 = "minimize"
+elev_type_0 = "max"
+elev_type_1 = "min"
 
 
 class Algorithms:

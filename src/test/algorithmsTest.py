@@ -10,7 +10,59 @@ class AlgorithmsTest:
         self.algorithms_obj = algorithms_obj
         self.graph = graph   
         self.route = route 
-  
+ 
+    def test_compute_cost_method(self):
+        # Test compute_cost method in Routing Algorithms
+        node_source = 0 
+        node_destination = 1 
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "no_elevation")        
+        assert isinstance(cost, float)
+        assert cost == 3.0
+
+        node_source = 1
+        node_destination = 0
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "no_elevation")   
+        assert isinstance(cost, float)
+        assert cost == 3.0
+
+        node_source = 2
+        node_destination = 6
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_drop")
+        assert isinstance(cost, float)
+        assert cost == 0.0
+
+        node_source = 6
+        node_destination = 2
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_drop")
+        assert isinstance(cost, float)
+        assert cost == 4.0
+
+        node_source = 4
+        node_destination = 1
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_gain")
+        assert isinstance(cost, float)
+        assert cost == 0.0
+
+        node_source = 1
+        node_destination = 4
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_gain")
+        assert isinstance(cost, float)
+        assert cost == 1.0
+
+        node_source = 0
+        node_destination = 3
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_difference")
+        assert isinstance(cost, float)
+        assert cost == 1.0
+    
+        node_source = 3
+        node_destination = 0
+        cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_difference")
+        assert isinstance(cost, float)
+        assert cost == -1.0
+
+        print("All compute cost tests passed")     
+
     def test_elevation_elevation_difference(self):
         # Test elevation method in Routing algorithms
         total_elevation = self.algorithms_obj.get_Elevation(self.route, cost_type = "elevation_difference")
@@ -36,7 +88,7 @@ class AlgorithmsTest:
         assert total_elevation == 6.726999999999999
         print("Test - test_elevation_no_elevation passed")   
  
-    def test_elevation(self):
+    def test_elevation_method(self):
        self.test_elevation_elevation_difference()
        self.test_elevation_gain()
        self.test_elevation_drop()
@@ -61,7 +113,7 @@ class AlgorithmsTest:
         assert best_path["elevation_distance"] <= shortest_path["elevation_distance"]
         print("Test - test_shortest_path_minimize_elevation passed")
 
-    def test_shortest_path(self):
+    def test_shortest_path_method(self):
         source = (42.3762, -72.5148)
         destination = (42.3948, -72.5266)
         graph_data_processing_obj = graph_data_processing()
@@ -74,5 +126,6 @@ class AlgorithmsTest:
         print("All shortest path tests passed")
 
     def runAllTests(self):
-       self.test_elevation()
-       self.test_shortest_path()
+       self.test_compute_cost_method()
+       self.test_elevation_method()
+       self.test_shortest_path_method()

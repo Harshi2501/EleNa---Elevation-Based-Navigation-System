@@ -17,7 +17,7 @@ elev_type_1 = "min"
 
 
 class Algorithms:
-    def __init__(self, graph, elev_perc = 0.0, elev_option = "maximize"):
+    def __init__(self, graph, elev_perc = 0.0, elev_option = elev_type_0):
 
         self.graph = graph
         self.elev_option = elev_option
@@ -102,7 +102,7 @@ class Algorithms:
 
 
 
-    def get_shortest_path(self, spt, ept, elev_perc, elev_option = "maximize", log=True):
+    def get_shortest_path(self, spt, ept, elev_perc, elev_option = elev_type_0, log=True):
         
         # Computes Shortest Path
         graph = self.graph

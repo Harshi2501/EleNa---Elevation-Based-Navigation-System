@@ -94,13 +94,6 @@ class graph_data_processing:
          return self.G
      
 
-if __name__ == "__main__":
-    graph_abstraction = graph_data_processing()
-    endpt = [40.7128, -74.0060]    
-    G = graph_abstraction.generate_graph(endpt) 
-    print(G) 
-             
-
 
      
 

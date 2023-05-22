@@ -41,10 +41,6 @@ class UnitTest:
         algorithmsTest = AlgorithmsTest(self.algorithms_obj, self.graph, self.route)
         algorithmsTest.runAllTests()
 
-        # Test functionalities of the front-end
-        #frontEndTest = FrontEndTest()
-        #frontEndTest.runAllTests()
-
 if __name__ == "__main__":
 
       # Instantiate test class and call the tests

@@ -58,8 +58,6 @@ class A_star:
     This function calculates the elevation for a route depending on the cost mode in terms on elevation gain, drop and differnence
     """
 
-
-
     def get_Elevation(self, route, cost_type = cost_mode_3):
         # For a particular route, the function returrns the total or piecewise cost.
         total = 0

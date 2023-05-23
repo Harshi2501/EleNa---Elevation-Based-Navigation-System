@@ -24,7 +24,8 @@ EleNa is a user-friendly web application designed to assist hikers and trekkers 
  ┃ ┣ 📜graphTest.py
  ┃ ┗ 📜unitTest.py
  ┣ 📜app.py
- ┗ 📜graph.p ```
+ ┗ 📜graph.p 
+ ```
  
 ## Setup
 

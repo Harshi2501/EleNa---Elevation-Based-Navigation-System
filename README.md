@@ -11,18 +11,20 @@ EleNa is a user-friendly web application designed to assist hikers and trekkers 
  ┃ ┣ 📜a_star.py
  ┃ ┣ 📜djikstra.py
  ┃ ┗ 📜routing_algorithms.py
+ ┣ 📂static
+ ┃ ┣ 📂css
+ ┃ ┃ ┗ 📜style.css
+ ┃ ┗ 📂js
+ ┃ ┃ ┗ 📜map.js
  ┣ 📂templates
  ┃ ┗ 📜map.html
  ┣ 📂test
- ┃ ┣ 📂htmlcov
- ┃ ┃ ┗ 📜index.html
  ┃ ┣ 📜algorithmsTest.py
  ┃ ┣ 📜coverage_report.pdf
  ┃ ┣ 📜graphTest.py
  ┃ ┗ 📜unitTest.py
  ┣ 📜app.py
- ┗ 📜graph.p
- ```
+ ┗ 📜graph.p ```
  
 ## Setup
 

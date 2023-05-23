@@ -27,6 +27,10 @@ class Djikstra:
         self.end_node =end_node
         self.shortest_dist=shortest_dist
 
+    """
+    This function calculates the cost from the starting point to the destination depending on the cost mode in terms on elevation gain, drop and differnence
+    """
+
     def compute_cost(self, start, end, cost_type = cost_mode_0):
         graph = self.graph   
         if start is None or end is None:
@@ -46,6 +50,9 @@ class Djikstra:
             return abs(graph.nodes[start]["elevation"] - graph.nodes[end]["elevation"])
 
 
+    """
+    This function calculates the elevation for a route depending on the cost mode in terms on elevation gain, drop and differnence
+    """
 
     def get_Elevation(self, route, cost_type = "cost_mode_3"):
         # For a particular route, the function returrns the total or piecewise cost.
@@ -63,6 +70,10 @@ class Djikstra:
             total += diff
         return total
 
+    """
+    This function returns the nodes involved in the path from the starting point to the destination
+    """
+
     def get_route(self, parent, end):
         path = []
         path.append(end)
@@ -70,6 +81,9 @@ class Djikstra:
             path.append(parent[path[-1]])
         return path[::-1]
     
+    """
+    This function computes the path using bfs traversal
+    """
 
     def bfs_traversal(self):
         graph = self.graph
@@ -130,6 +144,11 @@ class Djikstra:
         
         return parent, end_node, temp_dist
 
+    """
+    This function computes the path using the djikstras algorithm and sets the best_path variable accordingly
+    """
+
+
     def dijkstra_path(self):        
         if not (self.start_node is None or self.end_node is None):
             parent_node,end_node,curr_dist=self.bfs_traversal()
@@ -141,6 +160,10 @@ class Djikstra:
             self.best_path["drop_dist"]= drop_dist
             self.best_path["current_distance"]= curr_dist
         return
+
+    """
+    This function returns the best path
+    """
 
     def get_best_path(self):
         return self.best_path

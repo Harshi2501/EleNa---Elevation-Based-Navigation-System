@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #1b4d3e;
+    --secondary-color: #ffcc33;
+    --text-color: #333;
+    }
+
+    /* Update body font */
+    body {
+    font-family: "Lato", sans-serif;
+    }
+
+    /* Update sidenav styles */
+    .sidenav {
+    height: 100%;
+    width: 20%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: var(--primary-color);
+    overflow-x: hidden;
+    padding-top: 0px;
+    }
+
+    .sidenav a {
+    padding: 10px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #fff;
+    display: block;
+    }
+
+    .sidenav a:hover {
+    background-color: var(--secondary-color);
+    color: #333;
+    }
+
+    /* Update main styles */
+    .main {
+        position: relative;
+    margin-left: 20%;
+    font-size: 16px;
+    padding: 10px 10px;
+    height: 95vh;
+    }
+
+    /* Update map styles */
+    .map {
+    height: 100%;
+    }
+
+    /* Update form styles */
+    form {
+    margin-left: 20px;
+    }
+
+    label {
+    color: #fff;
+    }
+
+    input[type="text"],
+    select,
+    input[type="number"] {
+    background-color: #fff;
+    color: var(--text-color);
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 200px;
+    border-radius: 5px;
+    }
+
+    /* Update dropdown styles */
+    select option {
+    background-color: var(--primary-color);
+    color: #fff;
+    }
+
+    /* Update fancy heading styles */
+    .fancy-heading {
+    color: #fff;
+    font-family: "Lobster", cursive;
+    margin-left: 20px;
+    font-size: 40px;
+    }
+
+    .fancy-subheading {
+    color: #fff;
+    margin-left: 20px;
+    }
+
+    /* Update results styles */
+    .results {
+    color: #000;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 2px solid var(--secondary-color);
+    background-color: #fff;
+    text-align: center;
+    }
+
+    .results h2 {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .results p {
+        margin: 0;
+    }
+
+    .leaflet-dashed-line {
+        stroke-dasharray: 4, 8;
+        stroke: black; /* Customize the dashed line pattern */
+    }
+
+    .leaflet-solid-line {
+        stroke: red;
+    }

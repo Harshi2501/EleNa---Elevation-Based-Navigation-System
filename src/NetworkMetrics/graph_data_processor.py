@@ -16,11 +16,11 @@ class graph_data_processing:
             '''If the file exists, it is opened in binary mode using open and p.load is used to deserialize 
             the pickled object into self.G'''
             self.G = p.load( open( graph_path, "rb" ) )
-            #self.init is set to True to indicate that the graph is ready for use.
-            self.init = True
+            #self.graph_initialized is set to True to indicate that the graph is ready for use.
+            self.graph_initialized = True
             print("The graph is now ready to use.")
         else:
-            self.init = False
+            self.graph_initialized = False
     
     #Calculating the distance between the given latitudes and longitudes using harvesine formula
      def haversine_distance(self, latitude1, longitude1, latitude2, longitude2):
@@ -73,7 +73,7 @@ class graph_data_processing:
      def generate_graph(self, endpoint):
          start_latitude = 42.384803
          start_longitude = -72.529262
-         if not self.init:
+         if not self.graph_initialized:
              print("Loading graph")
              start = (start_latitude, start_longitude)
 
@@ -85,8 +85,8 @@ class graph_data_processing:
              self.G = self.add_elevation_data(self.G)
              with open("graph.p", "wb") as f:
                 p.dump(self.G, f)            
-            #Updates the self.init variable to True to indicate that the graph has been initialized.
-             self.init = True
+            #Updates the self.graph_initialized variable to True to indicate that the graph has been initialized.
+             self.graph_initialized= True
              print("Graph saved")
          '''Calls the add_dist function to add distance 
         information between the endpoint and all nodes in the graph'''

@@ -4,7 +4,6 @@ import os
 import pickle as p
 from NetworkMetrics.config import API
 import math
-from shapely.geometry import Point
 
 class graph_data_processing:
      def __init__(self):
@@ -91,25 +90,4 @@ class graph_data_processing:
          '''Calls the add_dist function to add distance 
         information between the endpoint and all nodes in the graph'''
          self.G = self.add_dist(self.G, endpoint)
-         return self.G
-     
-
-
-     
-
-
-
-     
-    
-    
-    
-
-    
-    
-    
-         
-    
-
-
-
-
+         return self.G     

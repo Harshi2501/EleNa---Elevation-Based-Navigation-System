@@ -4,6 +4,11 @@ from collections import deque, defaultdict
 from heapq import *
 import time
 
+"""
+This class is used to identify the shortest path using the a* algorithm
+"""
+
+
 cost_mode_0 = "no_elevation"
 cost_mode_1  = "elevation_drop"
 cost_mode_2 = "elevation_gain"
@@ -27,6 +32,10 @@ class A_star:
         self.end_node =end_node
         self.shortest_dist=shortest_dist
 
+    """
+    This function calculates the cost from the starting point to the destination depending on the cost mode in terms on elevation gain, drop and differnence
+    """
+
     def compute_cost(self, start, end, cost_type = cost_mode_0):
         graph = self.graph   
         if start is None or end is None:
@@ -44,6 +53,10 @@ class A_star:
             return max(0.0, graph.nodes[start]["elevation"] - graph.nodes[end]["elevation"])
         else:
             return abs(graph.nodes[start]["elevation"] - graph.nodes[end]["elevation"])
+   
+    """
+    This function calculates the elevation for a route depending on the cost mode in terms on elevation gain, drop and differnence
+    """
 
 
 
@@ -63,6 +76,9 @@ class A_star:
             total += diff
         return total
     
+    """
+    This function returns the nodes involved in the path from the starting point to the destination
+    """
 
     def get_route_a_star(self, nodes, curr_node):
         if not nodes or not curr_node:
@@ -74,6 +90,11 @@ class A_star:
         
         return path
 
+    """
+    This function sets the initial cost to infinity for all nodes except the first node
+    """
+
+
     def compute_initial_cost_a_star(self, graph):
         cost = {}
 
@@ -83,6 +104,10 @@ class A_star:
         cost[self.start_node] = 0
 
         return cost
+    
+    """
+    This function computes the path using the a* algorithm and sets the best_path variable accordingly
+    """
     
     def a_star_path(self):
         if self.start_node is None or self.end_node is None:
@@ -148,5 +173,9 @@ class A_star:
                 heuristics_graph_weights[neighbour] = new_cost_heuristics
                 updated_weights[neighbour] = graph_weights[neighbour] + graph.nodes[neighbour]['dist_from_dest']*0.1
 
+
+    """
+    This function returns the best path
+    """
     def get_best_path(self):
         return self.best_path

@@ -36,7 +36,9 @@ class Algorithms:
         # Reloading with modified graph
         self.graph = graph
 
-
+    """
+    This function calculates the cost from the starting point to the destination depending on the cost mode in terms on elevation gain, drop and differnence
+    """
     
     def compute_cost(self, start, end, cost_type = cost_mode_0):
         graph = self.graph   
@@ -56,7 +58,9 @@ class Algorithms:
         else:
             return abs(graph.nodes[start]["elevation"] - graph.nodes[end]["elevation"])
 
-
+    """
+    This function calculates the elevation for a route depending on the cost mode in terms on elevation gain, drop and differnence
+    """
 
     def get_Elevation(self, route, cost_type = "cost_mode_3"):
         # For a particular route, the function returrns the total or piecewise cost.
@@ -74,12 +78,9 @@ class Algorithms:
             total += diff
         return total
 
-    
-
-
-
-
-
+    '''
+    This function compares and compiles the results and returns the shortest pathe
+    '''
    
 
 
@@ -97,9 +98,9 @@ class Algorithms:
         
         return shortestPathStats, self.best_path
 
-
-   
-
+    """
+    Identifies the shortest path for the options selected from the paths returned by djikstra and a* algorithm
+    """
 
 
     def get_shortest_path(self, spt, ept, elev_perc, elev_option = elev_type_0, log=True):

@@ -15,19 +15,18 @@ class UnitTest:
        # Create an Algorithms object to test routing algorithms
        self.algorithms_obj = Algorithms(self.graph, elev_perc, elev_option)
 
-       elevations = [0.0, 0.0, 0.0, 1.0, 1.0, 3.0, 4.0]
+       elevations = [0.0, 1.0, 2.0, 1.0, 1.0, 3.0, 4.0]
 
        # Add nodes to the graph
        for i in range(7):
            self.graph.add_node(i, elevation = elevations[i])
 
        # Add edges to the graph    
-       # edges = [(0,1,5.0), (1,2,2.0), (0,3,1.414), (3,4,41.0), (4,2,1.313), (0,5,4.24), (5,2,4.04), (0,6,5.8), (6,2,9.10)]
-       edges = [(0,1,3.0), (1,2,3.0), (0,3,1.414), (3,4,4.0), (4,2,1.313), (0,5,4.24), (5,2,4.24), (0,6,5.0), (6,2,5.0)]
+       edges = [(5,2,4.04), (0,1,5.0),(6,2,9.10), (1,2,2.0), (0,3,1.414), (3,4,41.0), (4,2,1.313), (0,5,4.24), (0,6,5.8)]
        self.graph.add_weighted_edges_from(edges)
     
-       self.source = (42.373222, -72.519852)
-       self.destination = (42.375544, -72.524210)
+       self.source = (42.737321, -72.651978)
+       self.destination = (42.367755, -72.2524)
 
        # Have a route to test elevation in routing algorithms
        self.route = [0, 3, 4, 2]

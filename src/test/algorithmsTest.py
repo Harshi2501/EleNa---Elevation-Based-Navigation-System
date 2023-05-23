@@ -16,12 +16,12 @@ class AlgorithmsTest:
         node_source = 0 
         node_destination = 1 
         cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "no_elevation")        
-        assert cost == 3.0
+        assert cost == 5.0
 
         node_source = 1
         node_destination = 0
         cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "no_elevation")   
-        assert cost == 3.0
+        assert cost == 5.0
 
         node_source = 2
         node_destination = 6
@@ -31,17 +31,17 @@ class AlgorithmsTest:
         node_source = 6
         node_destination = 2
         cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_drop")
-        assert cost == 4.0
+        assert cost == 2.0
 
         node_source = 4
-        node_destination = 1
+        node_destination = 5
         cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_gain")
-        assert cost == 0.0
+        assert cost == 2.0
 
-        node_source = 1
+        node_source = 5
         node_destination = 4
         cost = self.algorithms_obj.compute_cost(node_source, node_destination, cost_type = "elevation_gain")
-        assert cost == 1.0
+        assert cost == 0.0
 
         node_source = 0
         node_destination = 3
@@ -58,22 +58,22 @@ class AlgorithmsTest:
     def test_elevation_elevation_difference(self):
         # Test elevation method in Routing algorithms
         total_elevation = self.algorithms_obj.get_Elevation(self.route, cost_type = "elevation_difference")
-        assert total_elevation == 0.0
+        assert total_elevation == 2.0
         print("Test - test_elevation_elevation_difference passed")
 
     def test_elevation_gain(self):
         total_elevation = self.algorithms_obj.get_Elevation(self.route, cost_type = "elevation_gain")
-        assert total_elevation == 1.0
+        assert total_elevation == 2.0
         print("Test - test_elevation_gain passed")
 
     def test_elevation_drop(self):
         total_elevation = self.algorithms_obj.get_Elevation(self.route, cost_type = "elevation_drop")
-        assert total_elevation == 1.0
+        assert total_elevation == 0.0
         print("Test - test_elevation_drop")
 
     def test_elevation_no_elevation(self): 
         total_elevation = self.algorithms_obj.get_Elevation(self.route, cost_type = "no_elevation")
-        assert total_elevation == 6.726999999999999
+        assert total_elevation == 43.727000000000004
         print("Test - test_elevation_no_elevation passed")   
  
     def test_elevation_method(self):
@@ -102,8 +102,8 @@ class AlgorithmsTest:
         print("Test - test_shortest_path_minimize_elevation passed")
 
     def test_shortest_path_method(self):
-        source = (42.3762, -72.5148)
-        destination = (42.3948, -72.5266)
+        source = (42.69376, -72.534148)
+        destination = (42.33433, -72.4555)
         graph_data_processing_obj = graph_data_processing()
         generated_graph = graph_data_processing_obj.generate_graph(destination)
         assert isinstance(generated_graph, nx.classes.multidigraph.MultiDiGraph)
